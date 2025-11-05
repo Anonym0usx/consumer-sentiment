@@ -38,6 +38,7 @@ divider_color = "#444" if is_dark else "#CCC"
 
 # Header
 # Header
+# Header
 st.markdown(
     f"""
     <div style="
@@ -50,14 +51,21 @@ st.markdown(
         backdrop-filter: blur(6px);
         margin-bottom:25px;
     ">
-        <h1 style="font-size:2.2em; margin-bottom:0.2em;">📊 Consumer Sentiment Analysis Dashboard</h1>
-        <h3 style="color:#C0C0C0; font-weight:400; margin-top:0;">Analyze how people feel about a brand, product, or topic</h3>
-        <p style="font-size:15px; margin-top:10px; color:#d3d3d3;">Created by <b style='color:#36AE7C;'>Soham Das</b></p>
+        <h1 style="font-size:2.4em; color:#F2F2F2; margin-bottom:0.2em;">
+            📊 Consumer Sentiment Analysis Dashboard
+        </h1>
+        <h3 style="color:#D3D3D3; font-weight:400; margin-top:0;">
+            Analyze how people feel about a brand, product, or topic
+        </h3>
+        <p style="font-size:15px; margin-top:10px; color:#BEBEBE;">
+            Created by <b style='color:#36AE7C;'>Soham Das</b>
+        </p>
         <hr style="border: 0.5px solid rgba(255,255,255,0.2); margin-top:20px;">
     </div>
     """,
     unsafe_allow_html=True
 )
+
 
 # File upload
 uploaded_file = st.file_uploader("Upload a CSV file with Tweets or Reviews", type=["csv"])
