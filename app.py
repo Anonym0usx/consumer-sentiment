@@ -68,14 +68,26 @@ st.write("Detected columns:", list(df.columns))
 
 # Word cloud for Positive Sentiments
 st.subheader("Most Frequent Words in Positive Sentences")
-text = ' '.join(df[df['Sentiment'] == 'Positive']['Tweet'].astype(str))
-if text:
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    st.pyplot(plt)
+
+# Automatically detect text column for visualization
+text_col = None
+for col in df.columns:
+    if col.lower() in ['text', 'tweet', 'review', 'comment']:
+        text_col = col
+        break
+
+if text_col:
+    text = ' '.join(df[df['Sentiment'] == 'Positive'][text_col].astype(str))
+    if text.strip():
+        wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis('off')
+        st.pyplot(plt)
+    else:
+        st.warning("No positive text found in the dataset.")
 else:
-    st.warning("No positive tweets found in the dataset.")
+    st.warning("No valid text column found for generating a word cloud.")
+
 
 # Optionally show data
 with st.expander("View Raw Data"):
