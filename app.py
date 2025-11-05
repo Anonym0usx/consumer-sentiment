@@ -10,17 +10,27 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 # Ensure required data is available
 nltk.download('vader_lexicon')
 
+# Detect theme mode (dark/light)
+theme = st.get_option("theme.base")
+is_dark = theme == "dark"
+
 # Page config
 st.set_page_config(page_title="Consumer Sentiment Dashboard", layout="wide")
 
+# Dynamic colors for theme
+bg_color = "#0E1117" if is_dark else "#FFFFFF"
+text_color = "#FAFAFA" if is_dark else "#333333"
+divider_color = "#444" if is_dark else "#CCC"
+
+
 # Header
 st.markdown(
-    """
-    <div style="text-align:center;">
+    f"""
+    <div style="text-align:center; background-color:{bg_color}; color:{text_color}; padding:10px;">
         <h1>📊 Consumer Sentiment Analysis Dashboard</h1>
         <h3 style="color:gray;">Analyze how people feel about a brand, product, or topic</h3>
         <p style="font-size:15px;">Created by <b>Soham Das</b></p>
-        <hr style="border: 1px solid #444;">
+        <hr style="border: 1px solid {divider_color};">
     </div>
     """,
     unsafe_allow_html=True
@@ -62,15 +72,17 @@ if 'Sentiment' not in df.columns:
         st.stop()
     else:
         text_col = text_like_cols[0]
-        st.info(f"Detected text column: '{text_col}' — running sentiment analysis...")
+        # Show progress spinner while analyzing text
+        with st.spinner("Analyzing sentiment... please wait"):
+            sia = SentimentIntensityAnalyzer()
+            df['Sentiment'] = df[text_col].apply(lambda x: (
+                'Positive' if sia.polarity_scores(str(x))['compound'] > 0
+                else ('Negative' if sia.polarity_scores(str(x))['compound'] < 0
+                else 'Neutral')
+            ))
 
-        sia = SentimentIntensityAnalyzer()
-        df['Sentiment'] = df[text_col].apply(lambda x: (
-            'Positive' if sia.polarity_scores(str(x))['compound'] > 0
-            else ('Negative' if sia.polarity_scores(str(x))['compound'] < 0
-            else 'Neutral')
-        ))
-else:
+        st.success("✅ Sentiment analysis complete!")
+    else:
     text_col = None
     for col in df.columns:
         if col.lower() in ['text', 'tweet', 'review', 'comment']:
@@ -94,6 +106,21 @@ fig = px.bar(
 )
 fig.update_layout(xaxis_title="", yaxis_title="Percentage", showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
+
+# Quick Stats Summary
+st.subheader("📊 Summary Statistics")
+
+# Calculate metrics
+total_reviews = len(df)
+most_common_sentiment = df['Sentiment'].mode()[0]
+avg_text_len = int(df[text_col].astype(str).apply(len).mean()) if text_col else 0
+
+# Create layout
+col1, col2, col3 = st.columns(3)
+col1.metric("🧾 Total Reviews Analyzed", f"{total_reviews}")
+col2.metric("🏆 Most Common Sentiment", f"{most_common_sentiment}")
+col3.metric("✏️ Avg Text Length", f"{avg_text_len} chars")
+
 
 # Summary Metrics
 col1, col2, col3 = st.columns(3)
@@ -130,13 +157,38 @@ else:
 with st.expander("📄 View Raw Data"):
     st.dataframe(df.head(30))
 
-# Footer
-st.markdown(
-    """
+# Download analyzed data
+st.subheader("📥 Download Analyzed Data")
+
+csv = df.to_csv(index=False).encode('utf-8')
+st.download_button(
+    label="Download CSV",
+    data=csv,
+    file_name="analyzed_sentiment_results.csv",
+    mime="text/csv",
+    help="Click to download your sentiment analysis results as a CSV file."
+)
+
+# Footer + Button Styling
+st.markdown("""
+    <style>
+        div[data-testid="stDownloadButton"] button {
+            background-color: #36AE7C;
+            color: white;
+            border-radius: 8px;
+            padding: 0.5em 1.2em;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        div[data-testid="stDownloadButton"] button:hover {
+            background-color: #2E8B6A;
+            transform: scale(1.02);
+        }
+    </style>
+
     <hr style="border: 0.5px solid #777;">
     <p style="text-align:center; color:gray; font-size:13px;">
-    © 2025 Consumer Sentiment Dashboard | Built with ❤️ by Soham Das
+    © 2025 Consumer Sentiment Dashboard | Built by <b>Soham Das</b>
     </p>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
+
