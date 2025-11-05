@@ -45,7 +45,12 @@ if 'Sentiment' not in df.columns:
         text_col = text_like_cols[0]
         st.info(f"Detected text column: '{text_col}' — running sentiment analysis...")
 
+        import nltk
         from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+        # Download the VADER lexicon if not already present
+        nltk.download('vader_lexicon')
+
         sia = SentimentIntensityAnalyzer()
 
         df['Sentiment'] = df[text_col].apply(lambda x: (
