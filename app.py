@@ -82,12 +82,12 @@ if 'Sentiment' not in df.columns:
             ))
 
                 st.success("✅ Sentiment analysis complete!")
-else:
-    text_col = None
-    for col in df.columns:
-        if col.lower() in ['text', 'tweet', 'review', 'comment']:
-            text_col = col
-            break
+    else:
+        text_col = None
+        for col in df.columns:
+            if col.lower() in ['text', 'tweet', 'review', 'comment']:
+                text_col = col
+                break
 
 
 # Compute sentiment counts
