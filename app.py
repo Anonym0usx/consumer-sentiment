@@ -28,11 +28,31 @@ df.columns = df.columns.str.strip().str.capitalize()
 
 # Count plot
 st.subheader("Sentiment Distribution")
+# Check if Sentiment column exists
+if 'Sentiment' not in df.columns:
+    # Try to find a column that might contain text
+    possible_text_columns = [col for col in df.columns if col.lower() in ['text', 'tweet', 'review', 'comment']]
+    
+    if possible_text_columns:
+        text_col = possible_text_columns[0]
+        st.info(f"Detected text column: '{text_col}' — running sentiment analysis...")
+        
+        # Run sentiment analysis
+        from nltk.sentiment.vader import SentimentIntensityAnalyzer
+        sia = SentimentIntensityAnalyzer()
+        
+        df['Sentiment'] = df[text_col].apply(lambda x: (
+            'Positive' if sia.polarity_scores(str(x))['compound'] > 0
+            else ('Negative' if sia.polarity_scores(str(x))['compound'] < 0
+            else 'Neutral')
+        ))
+    else:
+        st.error("No text-like column found. Please upload a CSV with a column like 'Text', 'Tweet', or 'Review'.")
+        st.stop()
+
+# Now safely analyze sentiments
 sentiment_counts = df['Sentiment'].value_counts().reset_index()
-sentiment_counts.columns = ['Sentiment', 'Count']
-fig = px.bar(sentiment_counts, x='Sentiment', y='Count', color='Sentiment',
-             color_discrete_map={'Positive':'green','Negative':'red','Neutral':'gray'})
-st.plotly_chart(fig, use_container_width=True)
+st.write("Detected columns:", list(df.columns))
 
 # Word cloud for Positive Sentiments
 st.subheader("Most Frequent Words in Positive Sentences")
