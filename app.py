@@ -32,7 +32,7 @@ st.set_page_config(page_title="Consumer Sentiment Dashboard", layout="wide")
 
 # Dynamic colors for theme
 bg_color = "#0E1117" if is_dark else "#FFFFFF"
-text_color = "#FAFAFA" if is_dark else "#333333"
+text_color = "#F2f2f2" if is_dark else "#333333"
 divider_color = "#444" if is_dark else "#CCC"
 
 
