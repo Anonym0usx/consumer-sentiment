@@ -7,6 +7,19 @@ import matplotlib.pyplot as plt
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
+@st.cache_resource
+def get_sentiment_analyzer():
+    from nltk.sentiment.vader import SentimentIntensityAnalyzer
+    return SentimentIntensityAnalyzer()
+
+@st.cache_data
+def load_csv(uploaded_file):
+    try:
+        df = pd.read_csv(uploaded_file)
+    except Exception:
+        df = pd.read_csv(uploaded_file, encoding='utf-8', on_bad_lines='skip', sep=None, engine='python')
+    return df
+
 # Ensure required data is available
 nltk.download('vader_lexicon')
 
@@ -41,10 +54,7 @@ uploaded_file = st.file_uploader("Upload a CSV file with Tweets or Reviews", typ
 
 # Load data
 if uploaded_file is not None:
-    try:
-        df = pd.read_csv(uploaded_file)
-    except Exception:
-        df = pd.read_csv(uploaded_file, encoding='utf-8', on_bad_lines='skip', sep=None, engine='python')
+    df = load_csv(uploaded_file)
 else:
     st.info("No file uploaded. Using sample sentiment dataset instead.")
     url = "https://raw.githubusercontent.com/dD2405/Twitter_Sentiment_Analysis/master/train.csv"
@@ -74,7 +84,7 @@ if 'Sentiment' not in df.columns:
         text_col = text_like_cols[0]
         # Show progress spinner while analyzing text
         with st.spinner("Analyzing sentiment... please wait"):
-            sia = SentimentIntensityAnalyzer()
+            sia = get_sentiment_analyzer()
             df['Sentiment'] = df[text_col].apply(lambda x: (
                 'Positive' if sia.polarity_scores(str(x))['compound'] > 0
                 else ('Negative' if sia.polarity_scores(str(x))['compound'] < 0
