@@ -37,13 +37,23 @@ divider_color = "#444" if is_dark else "#CCC"
 
 
 # Header
+# Header
 st.markdown(
     f"""
-    <div style="text-align:center; background-color:{bg_color}; color:{text_color}; padding:10px;">
-        <h1>📊 Consumer Sentiment Analysis Dashboard</h1>
-        <h3 style="color:gray;">Analyze how people feel about a brand, product, or topic</h3>
-        <p style="font-size:15px;">Created by <b>Soham Das</b></p>
-        <hr style="border: 1px solid {divider_color};">
+    <div style="
+        text-align:center; 
+        background-color:rgba(255, 255, 255, 0.07); 
+        color:{text_color}; 
+        padding:30px 20px; 
+        border-radius:15px;
+        box-shadow:0 2px 12px rgba(0,0,0,0.15);
+        backdrop-filter: blur(6px);
+        margin-bottom:25px;
+    ">
+        <h1 style="font-size:2.2em; margin-bottom:0.2em;">📊 Consumer Sentiment Analysis Dashboard</h1>
+        <h3 style="color:#C0C0C0; font-weight:400; margin-top:0;">Analyze how people feel about a brand, product, or topic</h3>
+        <p style="font-size:15px; margin-top:10px; color:#d3d3d3;">Created by <b style='color:#36AE7C;'>Soham Das</b></p>
+        <hr style="border: 0.5px solid rgba(255,255,255,0.2); margin-top:20px;">
     </div>
     """,
     unsafe_allow_html=True
