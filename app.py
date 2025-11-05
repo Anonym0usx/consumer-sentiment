@@ -13,15 +13,28 @@ nltk.download('vader_lexicon')
 # Page config
 st.set_page_config(page_title="Consumer Sentiment Dashboard", layout="wide")
 
-st.title("📊 Consumer Sentiment Analysis Dashboard")
-st.write("Analyze how people feel about a brand, product, or topic using natural language sentiment analysis.")
+# Header
+st.markdown(
+    """
+    <div style="text-align:center;">
+        <h1>📊 Consumer Sentiment Analysis Dashboard</h1>
+        <h3 style="color:gray;">Analyze how people feel about a brand, product, or topic</h3>
+        <p style="font-size:15px;">Created by <b>Soham Das</b></p>
+        <hr style="border: 1px solid #444;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # File upload
 uploaded_file = st.file_uploader("Upload a CSV file with Tweets or Reviews", type=["csv"])
 
 # Load data
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
+    try:
+        df = pd.read_csv(uploaded_file)
+    except Exception:
+        df = pd.read_csv(uploaded_file, encoding='utf-8', on_bad_lines='skip', sep=None, engine='python')
 else:
     st.info("No file uploaded. Using sample sentiment dataset instead.")
     url = "https://raw.githubusercontent.com/dD2405/Twitter_Sentiment_Analysis/master/train.csv"
@@ -32,12 +45,12 @@ else:
 # Clean up columns
 df.columns = df.columns.str.strip().str.capitalize()
 
-# Sentiment Analysis Section
-st.subheader("Sentiment Distribution")
+# Sentiment Analysis
+st.subheader("📈 Sentiment Distribution")
 
-# Check if 'Sentiment' column exists, otherwise generate it
+# Check if Sentiment column exists
 if 'Sentiment' not in df.columns:
-    # Try to find a text-like column
+    # Find likely text column
     text_like_cols = []
     for col in df.columns:
         sample_values = df[col].dropna().astype(str).head(10)
@@ -58,7 +71,6 @@ if 'Sentiment' not in df.columns:
             else 'Neutral')
         ))
 else:
-    # if sentiment already exists, detect text column for display
     text_col = None
     for col in df.columns:
         if col.lower() in ['text', 'tweet', 'review', 'comment']:
@@ -70,22 +82,32 @@ sentiment_counts = df['Sentiment'].value_counts(normalize=True).reset_index()
 sentiment_counts.columns = ['Sentiment', 'Percentage']
 sentiment_counts['Percentage'] *= 100
 
-# Show chart
-fig = px.bar(sentiment_counts,
-             x='Sentiment',
-             y='Percentage',
-             color='Sentiment',
-             text=sentiment_counts['Percentage'].apply(lambda x: f"{x:.1f}%"),
-             color_discrete_map={'Positive': 'green', 'Neutral': 'gray', 'Negative': 'red'},
-             title="Sentiment Breakdown (%)")
-
+# Chart
+fig = px.bar(
+    sentiment_counts,
+    x='Sentiment',
+    y='Percentage',
+    color='Sentiment',
+    text=sentiment_counts['Percentage'].apply(lambda x: f"{x:.1f}%"),
+    color_discrete_map={'Positive': '#36AE7C', 'Neutral': '#9BA4B5', 'Negative': '#EB5353'},
+    title="Sentiment Breakdown (%)"
+)
 fig.update_layout(xaxis_title="", yaxis_title="Percentage", showlegend=False)
 st.plotly_chart(fig, use_container_width=True)
 
-# Word Cloud
-st.subheader("Most Frequent Words in Positive Sentences")
+# Summary Metrics
+col1, col2, col3 = st.columns(3)
+positive = sentiment_counts.loc[sentiment_counts['Sentiment'] == 'Positive', 'Percentage'].sum()
+neutral = sentiment_counts.loc[sentiment_counts['Sentiment'] == 'Neutral', 'Percentage'].sum()
+negative = sentiment_counts.loc[sentiment_counts['Sentiment'] == 'Negative', 'Percentage'].sum()
 
-# Automatically detect text column for visualization
+col1.metric("😊 Positive", f"{positive:.1f}%")
+col2.metric("😐 Neutral", f"{neutral:.1f}%")
+col3.metric("☹️ Negative", f"{negative:.1f}%")
+
+# Word Cloud
+st.subheader("☁️ Most Frequent Words in Positive Sentences")
+
 if not text_col:
     for col in df.columns:
         if col.lower() in ['text', 'tweet', 'review', 'comment']:
@@ -104,6 +126,17 @@ if text_col:
 else:
     st.warning("No valid text column found for generating a word cloud.")
 
-# Optional: Expandable section for raw data
-with st.expander("View Raw Data"):
+# Raw Data Viewer
+with st.expander("📄 View Raw Data"):
     st.dataframe(df.head(30))
+
+# Footer
+st.markdown(
+    """
+    <hr style="border: 0.5px solid #777;">
+    <p style="text-align:center; color:gray; font-size:13px;">
+    © 2025 Consumer Sentiment Dashboard | Built with ❤️ by Soham Das
+    </p>
+    """,
+    unsafe_allow_html=True
+)
