@@ -29,26 +29,33 @@ df.columns = df.columns.str.strip().str.capitalize()
 # Count plot
 st.subheader("Sentiment Distribution")
 # Check if Sentiment column exists
+# Automatically detect and process sentiment
 if 'Sentiment' not in df.columns:
-    # Try to find a column that might contain text
-    possible_text_columns = [col for col in df.columns if col.lower() in ['text', 'tweet', 'review', 'comment']]
-    
-    if possible_text_columns:
-        text_col = possible_text_columns[0]
+    # Try to find columns that contain natural language text
+    text_like_cols = []
+    for col in df.columns:
+        sample_values = df[col].dropna().astype(str).head(10)
+        if any(len(v.split()) > 3 for v in sample_values):
+            text_like_cols.append(col)
+
+    if not text_like_cols:
+        st.error("No text-like column found. Please upload a CSV containing sentences, reviews, or comments.")
+        st.stop()
+    else:
+        text_col = text_like_cols[0]
         st.info(f"Detected text column: '{text_col}' — running sentiment analysis...")
-        
-        # Run sentiment analysis
+
         from nltk.sentiment.vader import SentimentIntensityAnalyzer
         sia = SentimentIntensityAnalyzer()
-        
+
         df['Sentiment'] = df[text_col].apply(lambda x: (
             'Positive' if sia.polarity_scores(str(x))['compound'] > 0
             else ('Negative' if sia.polarity_scores(str(x))['compound'] < 0
             else 'Neutral')
         ))
-    else:
-        st.error("No text-like column found. Please upload a CSV with a column like 'Text', 'Tweet', or 'Review'.")
-        st.stop()
+
+sentiment_counts = df['Sentiment'].value_counts().reset_index()
+
 
 # Now safely analyze sentiments
 sentiment_counts = df['Sentiment'].value_counts().reset_index()
