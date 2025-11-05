@@ -81,7 +81,7 @@ if 'Sentiment' not in df.columns:
                 else 'Neutral')
             ))
 
-                st.success("✅ Sentiment analysis complete!")
+        st.success("✅ Sentiment analysis complete!")
     else:
         text_col = None
         for col in df.columns:
