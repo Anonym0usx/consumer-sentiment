@@ -144,9 +144,9 @@ avg_text_len = int(df[text_col].astype(str).apply(len).mean()) if text_col else 
 
 # Layout Creation
 col1, col2, col3 = st.columns(3)
-col1.metric("🧾 Total Reviews Analyzed", f"{total_reviews}")
-col2.metric("🏆 Most Common Sentiment", f"{most_common_sentiment}")
-col3.metric("✏️ Avg Text Length", f"{avg_text_len} chars")
+col1.metric("Total Reviews Analyzed", f"{total_reviews}")
+col2.metric("Most Common Sentiment", f"{most_common_sentiment}")
+col3.metric("Avg Text Length", f"{avg_text_len} chars")
 
 
 # Summary Metrics
