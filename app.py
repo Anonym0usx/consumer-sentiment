@@ -52,7 +52,7 @@ st.markdown(
         margin-bottom:25px;
     ">
         <h1 style="font-size:2.4em; color:#F2F2F2; margin-bottom:0.2em;">
-            📊 Consumer Sentiment Analysis Dashboard
+            Consumer Sentiment Analysis Dashboard
         </h1>
         <h3 style="color:#D3D3D3; font-weight:400; margin-top:0;">
             Analyze how people feel about a brand, product, or topic
