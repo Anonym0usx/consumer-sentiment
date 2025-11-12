@@ -20,25 +20,22 @@ def load_csv(uploaded_file):
         df = pd.read_csv(uploaded_file, encoding='utf-8', on_bad_lines='skip', sep=None, engine='python')
     return df
 
-# Ensure required data is available
 nltk.download('vader_lexicon')
 
-# Detect theme mode (dark/light)
+
 theme = st.get_option("theme.base")
 is_dark = theme == "dark"
 
-# Page config
+
 st.set_page_config(page_title="Consumer Sentiment Dashboard", layout="wide")
 
-# Dynamic colors for theme
+
 bg_color = "#0E1117" if is_dark else "#FFFFFF"
 text_color = "#F2f2f2" if is_dark else "#333333"
 divider_color = "#444" if is_dark else "#CCC"
 
 
-# Header
-# Header
-# Header
+
 st.markdown(
     f"""
     <div style="
@@ -70,7 +67,7 @@ st.markdown(
 # File upload
 uploaded_file = st.file_uploader("Upload a CSV file with Tweets or Reviews", type=["csv"])
 
-# Load data
+# Data Loading
 if uploaded_file is not None:
     df = load_csv(uploaded_file)
 else:
@@ -84,11 +81,10 @@ else:
 df.columns = df.columns.str.strip().str.capitalize()
 
 # Sentiment Analysis
-st.subheader("📈 Sentiment Distribution")
+st.subheader("Sentiment Distribution")
 
-# Check if Sentiment column exists
+
 if 'Sentiment' not in df.columns:
-    # Find likely text column
     text_like_cols = []
     for col in df.columns:
         sample_values = df[col].dropna().astype(str).head(10)
@@ -141,12 +137,12 @@ st.plotly_chart(fig, use_container_width=True)
 # Quick Stats Summary
 st.subheader("📊 Summary Statistics")
 
-# Calculate metrics
+# Calculating metrics
 total_reviews = len(df)
 most_common_sentiment = df['Sentiment'].mode()[0]
 avg_text_len = int(df[text_col].astype(str).apply(len).mean()) if text_col else 0
 
-# Create layout
+# Layout Creation
 col1, col2, col3 = st.columns(3)
 col1.metric("🧾 Total Reviews Analyzed", f"{total_reviews}")
 col2.metric("🏆 Most Common Sentiment", f"{most_common_sentiment}")
@@ -164,7 +160,7 @@ col2.metric("😐 Neutral", f"{neutral:.1f}%")
 col3.metric("☹️ Negative", f"{negative:.1f}%")
 
 # Word Cloud
-st.subheader("☁️ Most Frequent Words in Positive Sentences")
+st.subheader("Most Frequent Words in Positive Sentences")
 
 if not text_col:
     for col in df.columns:
