@@ -99,7 +99,6 @@ https://consumer-sentiment-mczcdix4rbfxzmb9zcun3j.streamlit.app/
 👨‍💻 Author
 
 Soham Das
-BSc Economics & Management Sciences — University of Siena, Italy
 Passionate about AI, automation, and data-driven decision-making.
 
 📩 LinkedIn: https://www.linkedin.com/in/soham-das-b3a7bb258
